@@ -15,7 +15,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User findByName(String username) {
-        return em.createQuery("select u FROM User u JOIn fETCH u.roles WHERe u.username = :id", User.class)
+        return em.createQuery("SELECT u FROM User u JOIN FETCH u.roles WHERE u.username = :id", User.class)
                 .setParameter("id", username)
                 .getResultList().stream().findAny().orElse(null);
     }
@@ -39,7 +39,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> listUsers() {
-        return em.createQuery("select s from User s", User.class).getResultList();
+        return em.createQuery("SELECT s FROM User s", User.class).getResultList();
     }
 
     @Override

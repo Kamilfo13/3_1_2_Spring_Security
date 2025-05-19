@@ -9,19 +9,22 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
-import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
+import ru.kata.spring.boot_security.demo.service.UserService;
+
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Controller
 @RequestMapping("/admin")
 public class UserController {
 
-    private final UserServiceImpl userService;
+    private final UserService userService;
 
     @Autowired
-    public UserController(UserServiceImpl userService) {
-        this.userService = userService;
+    public UserController(UserService userService) {
+
+        this.userService=userService;
     }
 
     @GetMapping
@@ -37,11 +40,18 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public String createUser(/*@ModelAttribute("user") */User user) {
-        List<String> lsr = user.getRoles().stream().map(r->r.getRole()).collect(Collectors.toList());
-        List<Role> liRo = userService.listByRole(lsr);
-        user.setRoles(liRo);
-        userService.add(user);
+    public String createUser (User newUser ) {
+        List<String> roleNames = newUser.getRoles().stream()
+                .map(Role::getRole)
+                .collect(Collectors.toList());
+        List<Role> assignedRoles = userService.listByRole(roleNames);
+
+        if (assignedRoles.isEmpty()) {
+            return "redirect:/admin?error=rolesNotFound";
+        }
+
+        newUser.setRoles(assignedRoles);
+        userService.add(newUser);
         return "redirect:/admin";
     }
 
